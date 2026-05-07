@@ -1,0 +1,16 @@
+# Screenshot Instructions
+
+To add a theme screenshot:
+
+1. Create a 1200x900px image showing your theme's homepage
+2. Save it as `screenshot.png` in the theme root directory
+3. This will display in the WordPress Themes page
+
+For now, you can use any restaurant or food-related image as a placeholder, or create one after installing the theme.
+
+You can generate a screenshot by:
+- Taking a screenshot of the live site after installation
+- Using a design tool like Figma, Canva, or Photoshop
+- Using an online screenshot tool
+
+Recommended dimensions: 1200px × 900px (4:3 aspect ratio)

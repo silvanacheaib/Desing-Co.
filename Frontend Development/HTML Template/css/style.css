@@ -1,0 +1,146 @@
+/* 1. RESET & BASE */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 2. ROOT VARIABLES */
+:root {
+  /* COLORS */
+  --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-bg: #ffffff;
+  --color-text: #1e293b;
+
+  /* SPACING (based on 8px system) */
+  --space-xs: 0.5rem;   /* 8px */
+  --space-sm: 1rem;     /* 16px */
+  --space-md: 1.5rem;   /* 24px */
+  --space-lg: 2rem;     /* 32px */
+  --space-xl: 3rem;     /* 48px */
+
+  /* FONT SIZES (fluid & scalable) */
+  --fs-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.85rem);
+  --fs-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+  --fs-base: clamp(1rem, 0.95rem + 0.4vw, 1.125rem);
+  --fs-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --fs-xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --fs-xxl: clamp(2rem, 1.6rem + 2vw, 3rem);
+
+  /* LAYOUT */
+  --max-width: 1200px;
+}
+
+/* 3. TYPOGRAPHY */
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+h1 { font-size: var(--fs-xxl); }
+h2 { font-size: var(--fs-xl); }
+h3 { font-size: var(--fs-lg); }
+p  { font-size: var(--fs-base); }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 4. LAYOUT SYSTEM */
+.container {
+  width: 90%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+}
+
+.section {
+  padding: var(--space-xl) 0;
+}
+
+/* 5. FLEX & GRID HELPERS */
+.d-flex {
+  display: flex;
+}
+.d-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+.d-none{
+    display: none;
+}
+.d-block{
+    display: block;
+}
+.align-items-start{
+    align-items: flex-start;
+}
+.align-items-center{
+    align-items: center;
+}
+.align--items-end{
+    align-items: flex-end;
+}
+.justify-content-start{
+    justify-content: flex-start;
+}
+.justify-content-center{
+    justify-content: center;
+}
+.justify-content-end{
+    justify-content: flex-end;
+}
+/* 6. BUTTON BASE */
+.button {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 6px;
+  transition: 0.2s ease;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+/* =========================
+   7. MEDIA QUERIES (Mobile First)
+========================= */
+
+/* Tablets */
+@media (min-width: 768px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+/* Laptops */
+@media (min-width: 1024px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+/* Large Screens */
+@media (min-width: 1280px) {
+  html {
+    font-size: 18px;
+  }
+}

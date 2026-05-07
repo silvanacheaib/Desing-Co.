@@ -1,0 +1,54 @@
+# Image Placeholders
+
+This theme requires the following images for best results:
+
+## Required Images:
+
+1. **hero-bg.jpg** (1920x1080px)
+   - Hero section background
+   - Should be a high-quality restaurant interior or food photo
+   - Darker images work best with white text overlay
+
+2. **placeholder-menu.jpg** (800x600px)
+   - Default image for menu items without photos
+   - Generic food or plate image
+
+3. **gallery-1.jpg through gallery-6.jpg** (800x800px each)
+   - Gallery section photos
+   - Restaurant interior, food dishes, ambiance shots
+   - Square aspect ratio for uniform grid
+
+## Image Sources:
+
+You can get free high-quality restaurant images from:
+
+- **Unsplash** (https://unsplash.com)
+  - Search: "restaurant", "food", "Lebanese food", "dining"
+  
+- **Pexels** (https://pexels.com)
+  - Search: "restaurant interior", "middle eastern food"
+  
+- **Pixabay** (https://pixabay.com)
+  - Free commercial use images
+
+## How to Add Images:
+
+1. Download/prepare your images
+2. Rename them according to the list above
+3. Upload to `/wp-content/themes/cedars-restaurant-theme/assets/images/`
+4. Or use the WordPress Media Library for menu items and featured images
+
+## Tips:
+
+- Use high-resolution images (at least 1920px wide for hero)
+- Compress images for faster loading (use TinyPNG or similar)
+- Keep file sizes under 500KB when possible
+- Use consistent color grading for professional look
+- Ensure images have appropriate rights/licenses for commercial use
+
+## Customization:
+
+If you want different image names or sizes, update the references in:
+- `index.php` (for hero and gallery)
+- `style.css` (for background images)
+- `functions.php` (for thumbnail sizes)
