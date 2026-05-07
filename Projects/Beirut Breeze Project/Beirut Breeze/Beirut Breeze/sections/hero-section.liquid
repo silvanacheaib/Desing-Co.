@@ -1,0 +1,251 @@
+{% comment %}
+  Hero Section — Shopify Section with Swiper Slider
+{% endcomment %}
+
+{%- liquid
+  assign section_id  = 'hero-' | append: section.id
+  assign autoplay    = section.settings.autoplay
+  assign autoplay_ms = section.settings.autoplay_speed | times: 1000
+  assign loop        = section.settings.loop
+  assign show_arrows = section.settings.show_arrows
+  assign show_dots   = section.settings.show_dots
+  assign effect      = section.settings.transition_effect
+-%}
+
+<div class="container">
+  <div
+    id="{{ section_id }}"
+    class="hero-section swiper"
+    aria-label="{{ section.settings.aria_label | default: 'Hero banner' | escape }}"
+    data-autoplay="{{ autoplay }}"
+    data-autoplay-delay="{{ autoplay_ms }}"
+    data-loop="{{ loop }}"
+    data-effect="{{ effect }}"
+  >
+
+    {%- if section.blocks.size > 0 -%}
+
+      <div class="swiper-wrapper">
+
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign slide_image       = block.settings.image
+            assign slide_title       = block.settings.title
+            assign slide_description = block.settings.description
+            assign slide_btn_label   = block.settings.button_label
+            assign slide_btn_url     = block.settings.button_url
+
+            if forloop.first
+              assign loading = 'eager'
+              assign fetchpriority = 'high'
+            else
+              assign loading = 'lazy'
+              assign fetchpriority = 'auto'
+            endif
+          -%}
+
+          <div
+            class="swiper-slide"
+            {{ block.shopify_attributes }}
+            role="group"
+            aria-label="Slide {{ forloop.index }} of {{ section.blocks.size }}"
+          >
+
+            <div class="card-img-top">
+              {%- if slide_image != blank -%}
+                {{
+                  slide_image
+                  | image_url: width: 2000
+                  | image_tag:
+                    loading: loading,
+                    fetchpriority: fetchpriority,
+                    widths: '375, 550, 750, 1100, 1500, 1780, 2000',
+                    sizes: '100vw',
+                    class: 'img-fluid',
+                    alt: slide_image.alt | default: slide_title | escape
+                }}
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'img-fluid' }}
+              {%- endif -%}
+            </div>
+
+            <div class="card-img-overlay">
+
+              {%- if slide_title != blank -%}
+                <h1 class="hero-title">{{ slide_title | escape }}</h1>
+              {%- endif -%}
+
+              {%- if slide_description != blank -%}
+                <p class="hero-description">{{ slide_description | escape }}</p>
+              {%- endif -%}
+
+              {%- if slide_btn_label != blank and slide_btn_url != blank -%}
+                <a href="{{ slide_btn_url }}" class="hero-btn">
+                  {{ slide_btn_label | escape }}
+                </a>
+              {%- endif -%}
+
+            </div>
+
+          </div>
+
+        {%- endfor -%}
+
+      </div>
+
+      {%- if show_arrows and section.blocks.size > 1 -%}
+        <button class="swiper-button-prev" aria-label="Previous slide"></button>
+        <button class="swiper-button-next" aria-label="Next slide"></button>
+      {%- endif -%}
+
+      {%- if show_dots and section.blocks.size > 1 -%}
+        <div
+          class="swiper-pagination"
+          role="tablist"
+          aria-label="Slider pagination"
+        ></div>
+      {%- endif -%}
+
+    {%- else -%}
+
+      <div class="hero-section__empty">
+        <p>No slides added</p>
+      </div>
+
+    {%- endif -%}
+
+  </div>
+</div>
+
+{%- comment %} Swiper CDN (no missing asset issues) {%- endcomment %}
+
+{%- if section.blocks.size > 1 -%}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+{%- endif -%}
+
+<script>
+  (function () {
+    var SECTION_ID = {{ section_id | json }};
+
+    function initHero() {
+      var el = document.getElementById(SECTION_ID);
+      if (!el || typeof Swiper === 'undefined') return;
+
+      var autoplay = el.dataset.autoplay === 'true';
+      var delay    = parseInt(el.dataset.autoplayDelay, 10) || 5000;
+      var loop     = el.dataset.loop === 'true';
+      var effect   = el.dataset.effect || 'slide';
+
+      new Swiper('#' + SECTION_ID, {
+        effect: effect,
+        loop: loop,
+        speed: 700,
+        grabCursor: true,
+
+        a11y: {
+          prevSlideMessage: "Previous slide",
+          nextSlideMessage: "Next slide"
+        },
+
+        autoplay: autoplay ? {
+          delay: delay,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true
+        } : false,
+
+        navigation: {
+          nextEl: '#' + SECTION_ID + ' .swiper-button-next',
+          prevEl: '#' + SECTION_ID + ' .swiper-button-prev',
+        },
+
+        pagination: {
+          el: '#' + SECTION_ID + ' .swiper-pagination',
+          clickable: true,
+        },
+
+        on: {
+          slideChange: function (swiper) {
+            swiper.slides.forEach(function (slide, i) {
+              if (i === swiper.activeIndex) {
+                slide.setAttribute('aria-current', 'true');
+              } else {
+                slide.removeAttribute('aria-current');
+              }
+            });
+          }
+        }
+      });
+    }
+
+    if (typeof Swiper !== 'undefined') {
+      initHero();
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        var swiperScript = document.querySelector('script[src*="swiper-bundle"]');
+        if (swiperScript) swiperScript.addEventListener('load', initHero);
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Hero Section",
+  "tag": "div",
+  "class": "shopify-section--hero",
+  "settings": [
+    { "type": "header", "content": "Slider Behaviour" },
+    {
+      "type": "select",
+      "id": "transition_effect",
+      "label": "Transition effect",
+      "options": [
+        { "value": "slide", "label": "Slide" },
+        { "value": "fade", "label": "Fade" },
+        { "value": "cube", "label": "Cube" }
+      ],
+      "default": "fade"
+    },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto-play slides", "default": true },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Auto-play interval",
+      "default": 5
+    },
+    { "type": "checkbox", "id": "loop", "label": "Loop slides", "default": true },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show arrow navigation", "default": true },
+    { "type": "checkbox", "id": "show_dots", "label": "Show dot pagination", "default": true },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Section aria-label",
+      "placeholder": "Hero banner"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Background image" },
+        { "type": "text", "id": "title", "label": "Heading" },
+        { "type": "textarea", "id": "description", "label": "Description" },
+        { "type": "text", "id": "button_label", "label": "Button label" },
+        { "type": "url", "id": "button_url", "label": "Button URL" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Section",
+      "blocks": [{ "type": "slide" }]
+    }
+  ]
+}
+{% endschema %}

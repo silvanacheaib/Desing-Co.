@@ -1,0 +1,406 @@
+{% liquid
+  assign section_id = 'testimonials-slider-' | append: section.id
+
+  assign testimonials = blank
+
+  if metaobjects.testimonial != blank
+    assign testimonials = metaobjects.testimonial.values
+  elsif metaobjects.testimonials != blank
+    assign testimonials = metaobjects.testimonials.values
+  endif
+%}
+
+{{ 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css' | stylesheet_tag }}
+
+<section id="{{ section_id }}" class="testimonials-slider-section">
+  <div class="page-width">
+    {% if section.settings.heading != blank %}
+      <div class="section-header">
+        <h2 class="testimonial-heading">{{ section.settings.heading }}</h2>
+      </div>
+    {% endif %}
+
+    {% if testimonials != blank %}
+      <div class="testimonial-slider-wrap">
+        <div class="swiper testimonial-swiper">
+          <div class="swiper-wrapper">
+            {% for testimonial in testimonials %}
+              {% assign quote = testimonial.quote.value %}
+              {% assign author = testimonial.author.value %}
+              {% assign rating = testimonial.rating.value | default: 5 %}
+
+              {% if quote != blank or author != blank %}
+                <div class="swiper-slide">
+                  <article class="testimonial-card">
+                    <div class="testimonial-stars" aria-label="{{ rating }} out of 5 stars">
+                      {% for i in (1..5) %}
+                        <span class="star {% if i <= rating %}is-filled{% endif %}">
+                          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M12 2.5l2.94 5.96 6.58.96-4.76 4.64 1.12 6.56L12 17.53 6.12 20.62l1.12-6.56L2.48 9.42l6.58-.96L12 2.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
+                      {% endfor %}
+                    </div>
+
+                    {% if quote != blank %}
+                      <div class="testimonial-quote">
+                        <p>{{ quote }}</p>
+                      </div>
+                    {% endif %}
+
+                    {% if author != blank %}
+                      <div class="testimonial-author">
+                        {{ author }}
+                      </div>
+                    {% endif %}
+                  </article>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <button class="testimonial-nav testimonial-prev" aria-label="Previous slide" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button class="testimonial-nav testimonial-next" aria-label="Next slide" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    {% else %}
+      <div class="testimonials-empty-state">
+        <p>No testimonials found.</p>
+        <p>Make sure your metaobject type is <strong>testimonial</strong> or <strong>testimonials</strong>, and that entries are set to Active.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  #{{ section_id }} {
+    background: {{ section.settings.section_bg }};
+    padding: 72px 0 84px;
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .page-width {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  #{{ section_id }} .section-header {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+
+  #{{ section_id }} .testimonial-heading {
+    margin: 0;
+    color: {{ section.settings.heading_color }};
+    font-size: clamp(28px, 3vw, 48px);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  #{{ section_id }} .testimonial-slider-wrap {
+    position: relative;
+  }
+
+  #{{ section_id }} .testimonial-swiper {
+    overflow: visible;
+  }
+
+  #{{ section_id }} .swiper-slide {
+    height: auto;
+    opacity: 0.45;
+    transition: opacity 0.3s ease;
+  }
+
+  #{{ section_id }} .swiper-slide-active {
+    opacity: 1;
+  }
+
+  #{{ section_id }} .testimonial-card {
+    background: {{ section.settings.card_bg }};
+    color: {{ section.settings.text_color }};
+    border-radius: 22px;
+    padding: 34px 42px 40px;
+    min-height: 285px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+  }
+
+  #{{ section_id }} .testimonial-stars {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    color: {{ section.settings.star_color }};
+  }
+
+  #{{ section_id }} .testimonial-stars .star {
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    opacity: 0.55;
+  }
+
+  #{{ section_id }} .testimonial-stars .star.is-filled {
+    opacity: 1;
+  }
+
+  #{{ section_id }} .testimonial-stars svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  #{{ section_id }} .testimonial-quote {
+    font-size: clamp(22px, 2.1vw, 27px);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: {{ section.settings.text_color }};
+  }
+
+  #{{ section_id }} .testimonial-quote p {
+    margin: 0;
+  }
+
+  #{{ section_id }} .testimonial-author {
+    margin-top: 34px;
+    font-size: 18px;
+    font-weight: 700;
+    color: {{ section.settings.author_color }};
+  }
+
+  #{{ section_id }} .testimonial-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 72px;
+    height: 72px;
+    border: 0;
+    border-radius: 999px;
+    background: {{ section.settings.nav_bg }};
+    color: {{ section.settings.nav_icon_color }};
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  #{{ section_id }} .testimonial-nav:hover {
+    transform: translateY(-50%) scale(1.04);
+  }
+
+  #{{ section_id }} .testimonial-nav svg {
+    width: 34px;
+    height: 34px;
+    display: block;
+  }
+
+  #{{ section_id }} .testimonial-prev {
+    left: 4%;
+  }
+
+  #{{ section_id }} .testimonial-next {
+    right: 4%;
+  }
+
+  #{{ section_id }} .testimonials-empty-state {
+    text-align: center;
+    padding: 32px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.5);
+    color: {{ section.settings.text_color }};
+  }
+
+  @media screen and (max-width: 989px) {
+    #{{ section_id }} {
+      padding: 56px 0 64px;
+    }
+
+    #{{ section_id }} .testimonial-card {
+      padding: 28px 24px 30px;
+      min-height: auto;
+    }
+
+    #{{ section_id }} .testimonial-prev {
+      left: 8px;
+    }
+
+    #{{ section_id }} .testimonial-next {
+      right: 8px;
+    }
+
+    #{{ section_id }} .testimonial-nav {
+      width: 56px;
+      height: 56px;
+    }
+
+    #{{ section_id }} .testimonial-nav svg {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #{{ section_id }} .page-width {
+      padding: 0 16px;
+    }
+
+    #{{ section_id }} .section-header {
+      margin-bottom: 24px;
+    }
+
+    #{{ section_id }} .testimonial-card {
+      border-radius: 18px;
+    }
+
+    #{{ section_id }} .testimonial-quote {
+      font-size: 20px;
+      line-height: 1.45;
+    }
+
+    #{{ section_id }} .testimonial-author {
+      font-size: 16px;
+      margin-top: 24px;
+    }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js" defer></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sectionEl = document.getElementById('{{ section_id }}');
+    if (!sectionEl) return;
+
+    const swiperEl = sectionEl.querySelector('.testimonial-swiper');
+    const nextBtn = sectionEl.querySelector('.testimonial-next');
+    const prevBtn = sectionEl.querySelector('.testimonial-prev');
+    const slides = sectionEl.querySelectorAll('.swiper-slide');
+
+    if (!swiperEl || slides.length === 0) return;
+
+    function initSwiper() {
+      if (!window.Swiper) return;
+
+      new Swiper(swiperEl, {
+        loop: {{ section.settings.enable_loop }},
+        speed: 700,
+        centeredSlides: true,
+        grabCursor: true,
+        spaceBetween: 20,
+        slidesPerView: 1.08,
+        navigation: {
+          nextEl: nextBtn,
+          prevEl: prevBtn
+        },
+        breakpoints: {
+          750: {
+            slidesPerView: 1.25,
+            spaceBetween: 24
+          },
+          990: {
+            slidesPerView: 1.6,
+            spaceBetween: 28
+          },
+          1200: {
+            slidesPerView: 1.9,
+            spaceBetween: 32
+          }
+        }
+      });
+    }
+
+    if (window.Swiper) {
+      initSwiper();
+    } else {
+      window.addEventListener('load', initSwiper);
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What People Say"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_loop",
+      "label": "Enable infinite loop",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "section_bg",
+      "label": "Section background",
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#F3F3F3"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Quote text color",
+      "default": "#1F1F1F"
+    },
+    {
+      "type": "color",
+      "id": "author_color",
+      "label": "Author color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Star color",
+      "default": "#D7B56D"
+    },
+    {
+      "type": "color",
+      "id": "nav_bg",
+      "label": "Arrow button background",
+      "default": "#29542C"
+    },
+    {
+      "type": "color",
+      "id": "nav_icon_color",
+      "label": "Arrow icon color",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials"
+    }
+  ]
+}
+{% endschema %}

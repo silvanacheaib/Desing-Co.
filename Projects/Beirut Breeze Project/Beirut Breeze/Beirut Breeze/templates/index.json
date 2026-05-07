@@ -1,0 +1,20 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-section",
+      "settings": {
+        "hero_image": "",
+        "hero_title": "",
+        "hero_description": ""
+      }
+    },
+    "main": {
+      "type": "hello-world",
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "main"
+  ]
+}

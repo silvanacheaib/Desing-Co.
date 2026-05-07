@@ -1,0 +1,295 @@
+{% comment %}
+Main Page Content Section
+{% endcomment %}
+
+{%- assign handle = page.handle -%}
+
+{%- if handle == 'menu' -%}
+
+<div class="menu-page">
+
+{%- if section.settings.menu_title != blank -%} <h1 class="app-title">{{ section.settings.menu_title | escape }}</h1>
+{%- endif -%}
+
+{%- assign all_dishes = shop.metaobjects.dish.values -%}
+
+{%- if section.settings.show_featured -%}
+{%- assign featured_dishes = all_dishes | where: 'featured.value', true | slice: 0, 3 -%}
+
+```
+{%- if featured_dishes.size > 0 -%}
+  <div class="menu-page__featured">
+    {%- if section.settings.featured_title != blank -%}
+      <h2 class="app-subtitle">{{ section.settings.featured_title | escape }}</h2>
+    {%- endif -%}
+
+    <div class="featured-dishes-container d-flex flex-wrap">
+      {%- for dish in featured_dishes -%}
+        <div class="col-lg-3">
+          <div class="card menu-item">
+            <div class="card-body">
+
+              <div class="card-img-top">
+                {%- if dish.image != blank -%}
+                  {{
+                    dish.image.value
+                    | image_url: width: 600
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '200, 400, 600',
+                      sizes: '(min-width: 992px) 25vw, 50vw',
+                      class: 'img-fluid',
+                      alt: dish.image.value.alt | default: dish.name.value | escape
+                  }}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'img-fluid' }}
+                {%- endif -%}
+              </div>
+
+              {%- if dish.name.value != blank -%}
+                <h5 class="card-title">{{ dish.name.value | escape }}</h5>
+              {%- endif -%}
+
+              {%- if dish.description.value != blank -%}
+                <p class="card-text">{{ dish.description.value | escape }}</p>
+              {%- endif -%}
+
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+```
+
+{%- endif -%}
+
+{%- assign categories = '' -%}
+{%- for dish in all_dishes -%}
+{%- assign cat = dish.category.value -%}
+{%- unless categories contains cat -%}
+{%- assign categories = categories | append: cat | append: '||' -%}
+{%- endunless -%}
+{%- endfor -%}
+
+{%- assign category_list = categories | split: '||' -%}
+
+{%- if category_list.size > 0 -%}
+
+```
+<div class="menu-tabs" role="tablist">
+  {%- for cat in category_list -%}
+    {%- if cat != blank -%}
+      <button
+        class="menu-tab{% if forloop.first %} menu-tab--active{% endif %}"
+        data-category="{{ cat | handleize }}"
+        role="tab"
+        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+      >
+        {{ cat | escape }}
+      </button>
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+
+{%- for cat in category_list -%}
+  {%- if cat != blank -%}
+    {%- assign cat_dishes = all_dishes | where: 'category.value', cat -%}
+
+    <div
+      class="menu-category{% if forloop.first %} menu-category--active{% endif %}"
+      data-category="{{ cat | handleize }}"
+      role="tabpanel"
+    >
+      <h2 class="menu-category__title">{{ cat | escape }}</h2>
+
+      <div class="menu-category__grid">
+        {%- for dish in cat_dishes -%}
+          <div class="menu-item-card">
+
+            <div class="card-img-top">
+              {%- if dish.image != blank -%}
+                {{
+                  dish.image.value
+                  | image_url: width: 400
+                  | image_tag:
+                    loading: 'lazy',
+                    widths: '200, 300, 400',
+                    sizes: '(min-width: 992px) 16vw, (min-width: 576px) 25vw, 50vw',
+                    class: 'img-fluid',
+                    alt: dish.image.value.alt | default: dish.name.value | escape
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'img-fluid' }}
+              {%- endif -%}
+            </div>
+
+            {%- if dish.rating.value != blank -%}
+              <div class="menu-item-card__rating">{{ dish.rating.value | escape }}</div>
+            {%- endif -%}
+
+            {%- if dish.name.value != blank -%}
+              <h5 class="menu-item-card__title">{{ dish.name.value | escape }}</h5>
+            {%- endif -%}
+
+            {%- if dish.description.value != blank -%}
+              <p class="menu-item-card__description">{{ dish.description.value | escape }}</p>
+            {%- endif -%}
+
+          </div>
+        {%- endfor -%}
+      </div>
+
+    </div>
+  {%- endif -%}
+{%- endfor -%}
+```
+
+{%- endif -%}
+
+</div>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.menu-tab');
+  var panels = document.querySelectorAll('.menu-category');
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        t.classList.remove('menu-tab--active');
+        t.setAttribute('aria-selected', 'false');
+      });
+
+      panels.forEach(function (p) {
+        p.classList.remove('menu-category--active');
+      });
+
+      tab.classList.add('menu-tab--active');
+      tab.setAttribute('aria-selected', 'true');
+
+      var target = document.querySelector(
+        '.menu-category[data-category="' + tab.dataset.category + '"]'
+      );
+
+      if (target) target.classList.add('menu-category--active');
+    });
+  });
+})();
+</script>
+
+{%- elsif handle == 'media-center' -%}
+
+<div class="media-gallery">
+
+  <div class="media-gallery__header">
+    {%- if section.settings.gallery_title != blank -%}
+      <h1 class="media-gallery__title">{{ section.settings.gallery_title | escape }}</h1>
+    {%- endif -%}
+
+```
+{%- if section.settings.gallery_description != blank -%}
+  <p class="media-gallery__description">{{ section.settings.gallery_description | escape }}</p>
+{%- endif -%}
+```
+
+  </div>
+
+{%- assign gallery_blocks = section.blocks | where: 'type', 'gallery_image' -%}
+
+{%- if gallery_blocks.size > 0 -%} <div class="media-gallery__grid">
+{%- for block in gallery_blocks -%}
+
+```
+    {%- assign loading_attr = 'lazy' -%}
+    {%- assign fetch_attr = 'auto' -%}
+    {%- if forloop.first -%}
+      {%- assign loading_attr = 'eager' -%}
+      {%- assign fetch_attr = 'high' -%}
+    {%- endif -%}
+
+    <div class="media-gallery__item" {{ block.shopify_attributes }}>
+      {%- if block.settings.image != blank -%}
+        {{
+          block.settings.image
+          | image_url: width: 1200
+          | image_tag:
+            loading: loading_attr,
+            fetchpriority: fetch_attr,
+            widths: '300, 500, 700, 900, 1200',
+            sizes: '(min-width: 992px) 33vw, (min-width: 576px) 50vw, 100vw',
+            class: 'media-gallery__img',
+            alt: block.settings.alt_text | default: section.settings.gallery_title | escape
+        }}
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'media-gallery__img' }}
+      {%- endif -%}
+    </div>
+
+  {%- endfor -%}
+</div>
+```
+
+{%- endif -%}
+
+</div>
+
+{%- elsif handle == 'reviews' -%}
+
+<div class="reviews-page">
+
+  <div class="reviews-page__header">
+    {%- if section.settings.reviews_title != blank -%}
+      <h1 class="reviews-page__title">{{ section.settings.reviews_title | escape }}</h1>
+    {%- endif -%}
+
+```
+{%- if section.settings.reviews_description != blank -%}
+  <p class="reviews-page__description">{{ section.settings.reviews_description | escape }}</p>
+{%- endif -%}
+```
+
+  </div>
+
+{%- assign review_blocks = section.blocks | where: 'type', 'review' -%}
+
+{%- if review_blocks.size > 0 -%} <div class="reviews-page__grid">
+{%- for block in review_blocks -%}
+<div class="review-card" {{ block.shopify_attributes }}>
+
+```
+      {%- if block.settings.rating != blank -%}
+        <div class="review-card__rating">{{ block.settings.rating | escape }}</div>
+      {%- endif -%}
+
+      {%- if block.settings.body != blank -%}
+        <p class="review-card__body">{{ block.settings.body | escape }}</p>
+      {%- endif -%}
+
+      {%- if block.settings.author != blank -%}
+        <p class="review-card__author">{{ block.settings.author | escape }}</p>
+      {%- endif -%}
+
+    </div>
+  {%- endfor -%}
+</div>
+```
+
+{%- endif -%}
+
+</div>
+
+{%- else -%}
+
+<div class="page-content">
+  {%- if page.title != blank -%}
+    <h1 class="page-content__title">{{ page.title | escape }}</h1>
+  {%- endif -%}
+
+{%- if page.content != blank -%} <div class="page-content__body rte">{{ page.content }}</div>
+{%- endif -%}
+
+</div>
+
+{%- endif -%}

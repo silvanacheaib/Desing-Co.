@@ -1,0 +1,24 @@
+# This file contains a list of files that will be excluded from Shopify CLI
+# operations such as push, pull, dev, etc.
+#
+# Examples:
+#
+# Ignore a specific file:
+#   templates/product.json
+#
+# Ignore templates with a wildcard pattern:
+#   templates/*.json
+#
+# Ignore templates and sections with a regular expression:
+#   /(templates|sections)/.*\.json/
+
+# ── Protect all template JSONs ───────────────────────────────────────────────
+# Template JSON files store your hero slides and all other customizer content
+# (section blocks, text, images, links). Excluding them ensures `theme push`
+# never overwrites what you've saved in the Shopify customizer.
+templates/*.json
+
+# ── Protect global theme settings ────────────────────────────────────────────
+# The customizer writes colours, fonts, and global settings to this file.
+# Overwriting it resets your entire store appearance.
+config/settings_data.json

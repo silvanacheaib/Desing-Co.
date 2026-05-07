@@ -1,0 +1,86 @@
+{% liquid
+  assign primary_logo_asset = 'Logo-d.png'
+  assign secondary_logo_asset = 'Logo-m.png'
+  assign location_text = 'Location'
+  assign header_menu = linklists['main-menu'].links
+%}
+
+<header class="container">
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid justify-content-between align-items-center w-100">
+
+      <a class="navbar-brand d-flex align-items-center gap-2 m-0 p-0" href="{{ routes.root_url }}">
+        {% if primary_logo_asset != blank %}
+          <img
+            src="{{ primary_logo_asset | asset_url }}"
+            alt="{{ shop.name | escape }}"
+            class="header-logo header-logo--desktop d-none d-lg-block"
+            loading="eager"
+            width="180"
+            height="auto"
+          >
+        {% endif %}
+
+        {% if secondary_logo_asset != blank %}
+          <img
+            src="{{ secondary_logo_asset | asset_url }}"
+            alt="{{ shop.name | escape }}"
+            class="header-logo header-logo--mobile d-lg-none"
+            loading="eager"
+            width="120"
+            height="auto"
+          >
+        {% elsif primary_logo_asset != blank %}
+          <img
+            src="{{ primary_logo_asset | asset_url }}"
+            alt="{{ shop.name | escape }}"
+            class="header-logo header-logo--mobile"
+            loading="eager"
+            width="120"
+            height="auto"
+          >
+        {% endif %}
+      </a>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapsibleNavbar-{{ section.id }}"
+        aria-controls="collapsibleNavbar-{{ section.id }}"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div
+        class="collapse navbar-collapse justify-content-lg-between"
+        id="collapsibleNavbar-{{ section.id }}"
+      >
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          {% if header_menu != blank %}
+            {% for link in header_menu %}
+              <li class="nav-item">
+                <a class="nav-link {% if link.current %}active{% endif %}" href="{{ link.url }}">
+                  {{ link.title }}
+                </a>
+              </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+
+        <button class="header-location bg-transparent border-0 d-flex align-items-center gap-2" type="button">
+          <span class="header-location__icon" aria-hidden="true"></span>
+          <span>{{ location_text }}</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+</header>
+{% schema %}
+{
+  "name": "Header",
+  "settings": []
+}
+{% endschema %}

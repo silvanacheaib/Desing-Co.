@@ -1,0 +1,1 @@
+/Users/silvanacheaib/Design and Co./Beirut Breeze Project/Beirut Breeze/Beirut Breeze/AGENTS.md

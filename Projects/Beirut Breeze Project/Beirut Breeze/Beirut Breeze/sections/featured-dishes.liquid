@@ -1,0 +1,223 @@
+{% comment %}
+  Featured Dishes
+  Dynamic metaobject-driven section
+{% endcomment %}
+
+<div class="featured-dishes container">
+  {%- if section.settings.title != blank -%}
+    <h1 class="app-title">{{ section.settings.title | escape }}</h1>
+  {%- endif -%}
+
+  {%- assign dishes_handle = section.settings.dishes_metaobject_handle | strip -%}
+  {%- assign categories_handle = section.settings.categories_metaobject_handle | strip -%}
+
+  {%- assign all_dishes = metaobjects[dishes_handle].values -%}
+  {%- assign all_categories = metaobjects[categories_handle].values -%}
+
+  {%- if all_dishes != blank and all_dishes.count > 0 -%}
+
+    {%- if section.settings.display_mode == 'featured' -%}
+      {%- assign featured_count = 0 -%}
+
+      <div class="d-flex flex-wrap featured-dishes-container featured-dishes-home">
+        {%- for dish in all_dishes -%}
+          {%- if dish.featured.value == true and featured_count < 4 -%}
+            <div class="col-lg-3">
+              <div class="card menu-item">
+                <div class="card-body">
+                  <div class="card-img-top">
+                    {%- if dish.image.value != blank -%}
+                      {{
+                        dish.image.value
+                        | image_url: width: 1200
+                        | image_tag:
+                          width: 1200,
+                          height: 1200,
+                          class: 'img-fluid',
+                          alt: dish.title.value | escape
+                      }}
+                    {%- else -%}
+                      {{ 'product-1' | placeholder_svg_tag: 'img-fluid' }}
+                    {%- endif -%}
+                  </div>
+
+                  {%- if dish.rating.value != blank -%}
+                    <p class="card-rating m-0">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z" stroke="#C9A961" stroke-width="1.5"/>
+                      </svg>
+                      <span>{{ dish.rating.value }}</span>
+                    </p>
+                  {%- endif -%}
+
+                  {%- if dish.title.value != blank -%}
+                    <h5 class="card-title">{{ dish.title.value | escape }}</h5>
+                  {%- endif -%}
+
+                  {%- if dish.description.value != blank -%}
+                    <p class="card-text">{{ dish.description.value | escape | newline_to_br }}</p>
+                  {%- endif -%}
+                </div>
+              </div>
+            </div>
+            {%- assign featured_count = featured_count | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if featured_count == 0 -%}
+        <div class="featured-dishes__empty featured-dishes-container">
+          <p>No featured dishes found.</p>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.button_page != blank -%}
+        <div class="featured-dishes__cta text-center">
+          <a
+            href="{{ section.settings.button_page.url }}"
+            class="featured-dishes__button"
+            aria-label="{{ section.settings.button_label | default: 'Check our menu' | escape }}"
+          >
+            {{ section.settings.button_label | default: 'Check our menu' | escape }}
+          </a>
+        </div>
+      {%- endif -%}
+
+    {%- else -%}
+
+      {%- if all_categories != blank and all_categories.count > 0 -%}
+        <ul class="menu-tabs">
+          {%- for category in all_categories -%}
+            <li data-tab="{{ category.system.handle | escape }}">
+              {{ category.title.value | default: category.system.handle | escape }}
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <div class="menu-content">
+          {%- for category in all_categories -%}
+            <div class="tab-panel" id="{{ category.system.handle | escape }}">
+              <div class="d-flex flex-wrap">
+                {%- assign has_items = false -%}
+
+                {%- for dish in all_dishes -%}
+                  {%- if dish.category.value != blank and dish.category.value.system.handle == category.system.handle -%}
+                    {%- assign has_items = true -%}
+                    <div class="col-lg-3">
+                      <div class="card menu-item">
+                        <div class="card-body">
+                          <div class="card-img-top">
+                            {%- if dish.image.value != blank -%}
+                              {{
+                                dish.image.value
+                                | image_url: width: 1200
+                                | image_tag:
+                                  width: 1200,
+                                  height: 1200,
+                                  class: 'img-fluid',
+                                  alt: dish.title.value | escape
+                              }}
+                            {%- else -%}
+                              {{ 'product-1' | placeholder_svg_tag: 'img-fluid' }}
+                            {%- endif -%}
+                          </div>
+
+                          {%- if dish.rating.value != blank -%}
+                            <p class="card-rating m-0">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z" stroke="#C9A961" stroke-width="1.5"/>
+                              </svg>
+                              <span>{{ dish.rating.value }}</span>
+                            </p>
+                          {%- endif -%}
+
+                          {%- if dish.title.value != blank -%}
+                            <h5 class="card-title">{{ dish.title.value | escape }}</h5>
+                          {%- endif -%}
+
+                          {%- if dish.description.value != blank -%}
+                            <p class="card-text">{{ dish.description.value | escape | newline_to_br }}</p>
+                          {%- endif -%}
+                        </div>
+                      </div>
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+
+                {%- unless has_items -%}
+                  <div class="featured-dishes__empty">
+                    <p>No items in this category.</p>
+                  </div>
+                {%- endunless -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <div class="featured-dishes__empty">
+          <p>No menu categories found.</p>
+        </div>
+      {%- endif -%}
+
+    {%- endif -%}
+
+  {%- else -%}
+    <div class="featured-dishes__empty">
+      <p>No dishes added yet.</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Featured Dishes",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section heading",
+      "placeholder": "e.g. Featured Dishes"
+    },
+    {
+      "type": "text",
+      "id": "dishes_metaobject_handle",
+      "label": "Dishes metaobject handle",
+      "default": "dish",
+      "info": "Enter the metaobject definition handle for dishes, for example: dish"
+    },
+    {
+      "type": "text",
+      "id": "categories_metaobject_handle",
+      "label": "Categories metaobject handle",
+      "default": "menu_category",
+      "info": "Enter the metaobject definition handle for menu categories, for example: menu_category"
+    },
+    {
+      "type": "select",
+      "id": "display_mode",
+      "label": "Display mode",
+      "options": [
+        { "value": "featured", "label": "Featured (Home Page)" },
+        { "value": "full_menu", "label": "Full Menu (Menu Page)" }
+      ],
+      "default": "featured"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "CHECK OUR MENU"
+    },
+    {
+      "type": "page",
+      "id": "button_page",
+      "label": "Button page"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Dishes"
+    }
+  ]
+}
+{% endschema %}

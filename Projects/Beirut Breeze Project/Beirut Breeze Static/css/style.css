@@ -1,0 +1,98 @@
+:root{
+    --white-100:#FFFFFF;
+    --body_background_color:#FFF7ED;
+    --border-radius-0: 0;
+    --border-radius-0-5: 0.5rem;
+    --border-radius-1: 1rem;
+    --border-radius-2: 2rem;
+}
+html body{
+    background-color: var(--body_background_color);
+}
+html body header .navbar .navbar-collapse{
+    width: fit-content;
+    max-width: fit-content;
+}
+html body header .navbar .navbar-brand{
+    width: 8rem;
+    height: auto;
+    padding: 0;
+    margin: 0;
+}
+html body header .navbar .navbar-brand img{
+    height:100%;
+    width:100%;
+    object-fit:cover;
+}
+html body .swiper.hero-section{
+    border-radius: var(--border-radius-2);
+    height: 611px;
+}
+html body .swiper.hero-section .swiper-wrapper .swiper-slide .card-img-top img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+html body .swiper.hero-section .swiper-wrapper .swiper-slide .card-img-overlay{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 70%) 24%, rgb(0 0 0 / 10%));
+}
+
+html body .swiper.hero-section .swiper-wrapper .swiper-slide .card-img-overlay .hero-title{
+    color: var(--white-100);
+}
+html body .swiper.hero-section .swiper-wrapper .swiper-slide .card-img-overlay .hero-description{
+    color: var(--white-100);
+}
+html body .featured-dishes{
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+}
+html body .featured-dishes .featured-dishes-container{
+    gap:5rem 1rem;
+}
+html body .featured-dishes .featured-dishes-container .col-lg-3{
+    width:24%;
+    flex: 0 0 24%;
+}
+html body .featured-dishes .app-title{
+    text-align: center;
+}
+html body .featured-dishes .featured-dishes-container .card.menu-item{
+    border-radius: var(--border-radius-1);
+    background-color: white;
+    position: relative;
+    height: 17rem;
+    border: none;
+}
+html body .featured-dishes .featured-dishes-container .card.menu-item .card-body{
+    position:relative;
+    padding: 6rem 1rem;
+}
+html body .featured-dishes .featured-dishes-container .card.menu-item .card-body h5{
+    text-align:center;
+}
+html body .featured-dishes .featured-dishes-container .card.menu-item .card-body p{
+    text-align:center;
+}
+html body .featured-dishes .featured-dishes-container .card.menu-item .card-img-top{
+    position: absolute;
+    top: -4rem;
+    left: 50%;
+    transform: translate(-50% , 0%);
+    height: 8rem;
+    width: 8rem;
+    border-radius: 100%;
+    overflow: hidden;
+}
+html body .featured-dishes .featured-dishes-container .card.menu-item .card-img-top img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
