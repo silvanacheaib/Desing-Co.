@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "on-prime-branding-application-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/onPrimeBranding/OnPrimeBrandingApplicationCustomizer.js",
+          "manifest": "./src/extensions/onPrimeBranding/OnPrimeBrandingApplicationCustomizer.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "OnPrimeBrandingApplicationCustomizerStrings": "lib/extensions/onPrimeBranding/loc/{locale}.js"
+  }
+}
