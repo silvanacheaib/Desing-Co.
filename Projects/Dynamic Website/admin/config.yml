@@ -1,0 +1,20 @@
+backend:
+  name: github
+  repo: YOUR_USERNAME/YOUR_REPO_NAME
+  branch: main
+
+media_folder: "static/uploads"
+public_folder: "static/uploads"
+
+collections:
+  - name: "content"
+    label: "Site Content"
+    files:
+      - file: "content/data.json"
+        label: "Home Page"
+        name: "homepage"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Image", name: "image", widget: "image" }
+          - { label: "Video", name: "video", widget: "string" }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>My Site</title>
+</head>
+<body>
+  <h1 id="title"></h1>
+  <p id="description"></p>
+  <img id="image" src="" width="300" />
+  <iframe id="video" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+
+  <script>
+    fetch('content/data.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('title').textContent = data.title;
+        document.getElementById('description').textContent = data.description;
+        document.getElementById('image').src = data.image;
+        document.getElementById('video').src = data.video;
+      });
+  </script>
+</body>
+</html>
