@@ -85,34 +85,29 @@ interface PosState {
     currentView: 'floor' | 'admin' | 'kitchen' | 'menu';
     stats: AdminStats;
 
-    // View & Auth Actions
+    // Actions
     setView: (view: 'floor' | 'admin' | 'kitchen' | 'menu') => void;
     setActiveTable: (id: string | null) => void;
     setCurrentStaff: (staff: Staff | null) => void;
     initializeAuth: () => void;
 
-    // Notification Actions
     addNotification: (order: KitchenOrder) => void;
     clearNotification: (id: string) => void;
 
-    // Table & Reservation Logic
     fetchTables: () => Promise<void>;
     reserveTable: (tableId: string, details: { name: string; people: number; time: string }) => Promise<boolean>;
     cancelReservation: (tableId: string) => Promise<void>;
 
-    // API & Menu Management Actions
     fetchProducts: () => Promise<void>;
     addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
     updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
     deleteProduct: (id: string) => Promise<void>;
 
-    // Staff & Orders API
     fetchStaff: () => Promise<void>;
     fetchShifts: (staffId: string) => Promise<void>;
     fetchKitchenOrders: () => Promise<void>;
     fetchAdminStats: () => Promise<void>;
-
-    // POS Logic Actions
+    
     addToCart: (product: Product) => void;
     removeFromCart: (productId: string) => void;
     sendToKitchen: () => Promise<void>;
@@ -147,7 +142,6 @@ export const usePosStore = create<PosState>((set, get) => ({
         const table = get().tables.find(t => t.id === id);
         set({
             activeTableId: id,
-            // Keep items visible: Load stored orders if occupied, else clear cart
             cart: table && table.orders ? [...table.orders] : [] 
         });
     },
@@ -192,7 +186,6 @@ export const usePosStore = create<PosState>((set, get) => ({
                         id: dbTable.id,
                         status: dbTable.status.toUpperCase() as any,
                         reservedBy: dbTable.waiter_name,
-                        // Ensure items stay in table state if needed
                         orders: t.orders.length > 0 ? t.orders : []
                     };
                 })
@@ -218,7 +211,12 @@ export const usePosStore = create<PosState>((set, get) => ({
     },
 
     fetchProducts: async () => {
-        const { data, error } = await supabase.from('products').select('*').order('name', { ascending: true });
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true) 
+            .order('name', { ascending: true });
+
         if (!error && data) {
             set({
                 products: data.map(p => ({
@@ -233,17 +231,17 @@ export const usePosStore = create<PosState>((set, get) => ({
         }
     },
 
-    // --- MENU MANAGEMENT (ADD / EDIT / DELETE) ---
-    
     addProduct: async (newProduct) => {
         const { error } = await supabase.from('products').insert([{
             name: newProduct.name,
             description: newProduct.description,
             image_url: newProduct.image_url,
             price_usd: newProduct.priceUSD,
-            category: newProduct.category
+            category: newProduct.category,
+            is_active: true // Explicitly set to true on creation
         }]);
         if (!error) await get().fetchProducts();
+        else console.error("Database Insert Error:", error.message);
     },
 
     updateProduct: async (id, updates) => {
@@ -256,21 +254,24 @@ export const usePosStore = create<PosState>((set, get) => ({
         }).eq('id', id);
         
         if (!error) await get().fetchProducts();
+        else console.error("Database Update Error:", error.message);
     },
 
     deleteProduct: async (id) => {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-        
-        if (error) {
-            alert("Cannot delete: This item exists in order history. Try renaming it instead.");
-        } else {
-            // Optimistic UI update
-            set(state => ({ products: state.products.filter(p => p.id !== id) }));
-            await get().fetchProducts();
-        }
-    },
-
-    // --- POS LOGIC & KITCHEN ---
+    const { error } = await supabase
+        .from('products')
+        .update({ is_active: false }) 
+        .eq('id', id);
+    
+    if (error) {
+        console.error("Delete failed:", error.message);
+    } else {
+        // This line is what makes it vanish from your screen immediately
+        set(state => ({ 
+            products: state.products.filter(p => p.id !== id) 
+        }));
+    }
+},
 
     addToCart: (product) => set((state) => {
         const existing = state.cart.find(item => item.id === product.id);
@@ -300,8 +301,6 @@ export const usePosStore = create<PosState>((set, get) => ({
         const { error } = await supabase.from('kitchen_orders').insert(dbOrders);
         if (!error) {
             await supabase.from('table_sessions').update({ status: 'OCCUPIED' }).eq('id', activeTableId);
-            
-            // Persist locally so they stay visible when re-clicking
             set((state) => ({
                 tables: state.tables.map(t => t.id === activeTableId ? { ...t, status: 'OCCUPIED', orders: [...cart] } : t),
                 cart: [],
@@ -316,7 +315,6 @@ export const usePosStore = create<PosState>((set, get) => ({
         const targetTable = tables.find(t => t.id === tableId);
         if (!targetTable) return;
 
-        // Calculate stats for history
         const totalUSD = cart.reduce((sum, item) => sum + (item.priceUSD * item.quantity), 0);
         const itemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -345,7 +343,6 @@ export const usePosStore = create<PosState>((set, get) => ({
         }
     },
 
-    // --- OTHER ACTIONS (Reserve, Staff, Shifts) ---
     reserveTable: async (tableId, details) => {
         const { data, error } = await supabase.from('table_sessions').update({
             status: 'RESERVED', waiter_name: details.name, people_count: details.people, arrival_time: details.time
@@ -353,28 +350,35 @@ export const usePosStore = create<PosState>((set, get) => ({
         if (!error && data?.length) { await get().fetchTables(); return true; }
         return false;
     },
+
     cancelReservation: async (tableId) => {
         await supabase.from('table_sessions').update({ status: 'AVAILABLE', waiter_name: null }).eq('id', tableId);
         await get().fetchTables();
     },
+
     markAsServed: async (tableId) => {
         await supabase.from('table_sessions').update({ status: 'SERVED' }).eq('id', tableId);
         await get().fetchTables();
     },
+
     fetchStaff: async () => {
         const { data } = await supabase.from('staff').select('*');
         if (data) set({ staff: data });
     },
+
     fetchShifts: async (staffId) => {
         const { data } = await supabase.from('shifts').select('*').eq('staff_id', staffId);
         if (data) set({ staffShifts: data });
     },
+
     fetchKitchenOrders: async () => {
         const { data } = await supabase.from('kitchen_orders').select('*').eq('status', 'pending');
         if (data) set({ kitchenOrders: data });
     },
+
     addNotification: (order) => set((state) => ({
         notifications: [{ id: order.id, message: `${order.product_name} ready!`, table_number: order.table_number, timestamp: new Date() }, ...state.notifications]
     })),
+
     clearNotification: (id) => set((state) => ({ notifications: state.notifications.filter(n => n.id !== id) })),
 }));
