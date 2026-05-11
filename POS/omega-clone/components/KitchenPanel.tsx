@@ -1,10 +1,30 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { usePosStore } from '../store/usePosStore';
 import { Clock, CheckCircle2, Utensils, Zap } from 'lucide-react';
 
 export const KitchenPanel = () => {
   const { kitchenOrders } = usePosStore();
+  const [filterStation, setFilterStation] = useState('All');
+
+  const filteredOrders = filterStation === 'All' ? kitchenOrders : kitchenOrders.filter(order => order.station === filterStation);
+
+  return (
+  <div>
+    <div className="flex gap-4 mb-6">
+      {['All', 'Grill', 'Bar', 'Cold'].map(s => (
+        <button 
+          onClick={() => setFilterStation(s)}
+          className={`px-4 py-2 rounded-lg ${filterStation === s ? 'bg-orange-500 text-white' : 'bg-slate-100'}`}
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+    {/* Render your filteredOrders cards here */}
+  </div>
+);
+
 
   if (kitchenOrders.length === 0) {
     return (

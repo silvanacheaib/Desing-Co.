@@ -68,7 +68,7 @@ export const OrderPanel = () => {
     };
 
     return (
-        <div className="fixed inset-0 bg-slate-50 z-[150] flex flex-col animate-in fade-in zoom-in-95 duration-300 overflow-hidden">
+        <div className="orderPanel flex flex-col animate-in fade-in zoom-in-95 duration-300 overflow-hidden">
             {/* Header */}
             <header className="h-24 bg-white border-b border-slate-200 flex items-center justify-between px-10 shrink-0">
                 <div className="flex items-center gap-6">
@@ -106,7 +106,7 @@ export const OrderPanel = () => {
                 </main>
 
                 {/* Right Side: Bill Summary */}
-                <aside className="w-[450px] bg-white border-l border-slate-200 flex flex-col">
+                <aside className="orderPanel w-[450px] bg-white border-l border-slate-200 flex flex-col">
                     <div className="p-8 flex-1 overflow-y-auto">
                         <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 mb-8">Current Bill</h3>
                         <div className="space-y-4">

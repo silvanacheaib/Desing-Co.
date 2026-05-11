@@ -3,8 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { CheckCircle2, Clock, Utensils, Hash } from 'lucide-react';
 
+interface GroupedTicket {
+  table_number: number;
+  waiter_name: string;
+  time: string;
+  items: Array<{ name: string; qty: number }>;
+  ids: string[];
+}
+
 export const KitchenFeed = () => {
-  const [groupedOrders, setGroupedOrders] = useState<any[]>([]);
+  const [groupedOrders, setGroupedOrders] = useState<GroupedTicket[]>([]);
 
   const fetchKitchenOrders = async () => {
     const { data, error } = await supabase
@@ -13,10 +21,9 @@ export const KitchenFeed = () => {
       .eq('status', 'pending')
       .order('created_at', { ascending: true });
 
-    if (data) {
+    if (!error && data) {
       // Grouping Logic: Bundles items by Table and Time
-      const groups = data.reduce((acc: any, order: any) => {
-        // We use Table + Time to ensure orders from the same table 10 minutes apart stay separate
+      const groups = data.reduce((acc: Record<string, GroupedTicket>, order: any) => {
         const timeKey = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const groupKey = `${order.table_number}-${timeKey}`;
         
@@ -26,7 +33,7 @@ export const KitchenFeed = () => {
             waiter_name: order.waiter_name,
             time: timeKey,
             items: [],
-            ids: [] // Store all IDs to mark the whole ticket as served
+            ids: []
           };
         }
         acc[groupKey].items.push({ name: order.product_name, qty: order.quantity });
@@ -55,7 +62,7 @@ export const KitchenFeed = () => {
     const { error } = await supabase
       .from('kitchen_orders')
       .update({ status: 'served' })
-      .in('id', ids); // Updates all items in the group at once
+      .in('id', ids);
     
     if (!error) fetchKitchenOrders();
   };
@@ -64,7 +71,6 @@ export const KitchenFeed = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {groupedOrders.map((ticket, index) => (
         <div key={index} className="bg-white border-2 border-slate-100 rounded-[3rem] overflow-hidden shadow-sm hover:shadow-xl transition-all group">
-          {/* Ticket Header */}
           <div className="bg-slate-900 p-6 text-white flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="bg-blue-500 text-white w-10 h-10 rounded-xl flex items-center justify-center font-black italic">
@@ -82,9 +88,8 @@ export const KitchenFeed = () => {
             </div>
           </div>
 
-          {/* Ticket Body (Grouped Items) */}
           <div className="p-8 space-y-4">
-            {ticket.items.map((item: any, i: number) => (
+            {ticket.items.map((item, i) => (
               <div key={i} className="flex justify-between items-center border-b border-slate-50 pb-3 last:border-0">
                 <p className="font-black text-lg text-slate-800 tracking-tight">{item.name}</p>
                 <div className="bg-slate-100 px-3 py-1 rounded-lg font-black text-sm text-slate-500">
@@ -94,7 +99,6 @@ export const KitchenFeed = () => {
             ))}
           </div>
 
-          {/* Complete Button */}
           <div className="px-8 pb-8">
             <button 
               onClick={() => completeTicket(ticket.ids)}
